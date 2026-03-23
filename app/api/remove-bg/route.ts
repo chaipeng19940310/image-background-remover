@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge'
-
 export async function POST(req: NextRequest) {
   const formData = await req.formData()
   const file = formData.get('image') as File | null
@@ -37,11 +35,11 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  return new NextResponse(res.body, {
+  const buffer = await res.arrayBuffer()
+  return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'image/png',
       'Content-Disposition': 'inline; filename="result.png"',
-      'Cache-Control': 'no-store',
     },
   })
 }
