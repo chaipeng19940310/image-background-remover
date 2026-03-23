@@ -1,72 +1,31 @@
 # Image Background Remover
 
-A lightweight MVP for removing image backgrounds online with the remove.bg API.
+Current status: paused.
 
-## Stack
+## What this repo currently contains
 
-- Next.js 14 (App Router)
-- Tailwind CSS
-- TypeScript
-- Cloudflare Pages deployment target
-- remove.bg API for background removal
+- A basic MVP codebase for an image background remover website
+- Next.js app with simple landing pages
+- A server route for remove.bg integration in the earlier MVP path
+- SEO support pages such as privacy, terms, robots, and sitemap
 
-## MVP features
+## Current project state
 
-- Upload a single JPG, PNG, or WEBP image
-- File size limit: 10MB
-- In-memory processing only
-- Transparent PNG response
-- SEO-friendly landing pages
-- Privacy Policy and Terms pages
-- sitemap.xml and robots.txt support
+- Local workspace is clean
+- GitHub `main` is in sync with local
+- Experimental Cloudflare Pages compatibility changes were reverted
+- Local environment secrets were removed
+- Local dependencies and build artifacts were cleaned up
 
-## Local development
+## Notes
 
-```bash
-npm install
-```
+- Cloudflare Pages setup was attempted but is not the active path right now
+- If deployment work resumes later, start from the current clean state and choose the deployment target deliberately
 
-Create `.env.local`:
+## Recommended next step
 
-```bash
-REMOVE_BG_API_KEY=your_remove_bg_api_key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
+Before making more deployment changes, first confirm:
 
-Run the dev server:
-
-```bash
-npm run dev
-```
-
-Open <http://localhost:3000>.
-
-## API
-
-### `POST /api/remove-bg`
-
-Accepts `multipart/form-data` with the field:
-
-- `image`
-
-Returns:
-
-- `image/png` on success
-- JSON error payload on failure
-
-## Deployment notes
-
-Deploy to Cloudflare Pages and set these environment variables:
-
-- `REMOVE_BG_API_KEY`
-- `NEXT_PUBLIC_SITE_URL`
-
-Recommended production value for `NEXT_PUBLIC_SITE_URL`:
-
-```bash
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-```
-
-## Privacy model
-
-This app is designed not to permanently store uploaded images or processed outputs. Images are forwarded to remove.bg only to fulfill the current request.
+1. deployment target (Cloudflare Pages / Vercel / other)
+2. whether to keep remove.bg as the backend provider
+3. whether this repo should continue from the current MVP or be rebuilt more cleanly
