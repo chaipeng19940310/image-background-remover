@@ -1,23 +1,26 @@
 # Image Background Remover
 
-A lightweight web app to remove image backgrounds instantly using the [remove.bg](https://www.remove.bg) API.
+A lightweight MVP for removing image backgrounds online with the remove.bg API.
 
-## Features
-
-- Drag & drop or click to upload
-- Supports JPG, PNG, WEBP (max 10MB)
-- Before / after comparison
-- One-click PNG download
-- No image storage — all in-memory
-
-## Tech Stack
+## Stack
 
 - Next.js 14 (App Router)
 - Tailwind CSS
-- remove.bg API
 - TypeScript
+- Cloudflare Pages deployment target
+- remove.bg API for background removal
 
-## Getting Started
+## MVP features
+
+- Upload a single JPG, PNG, or WEBP image
+- File size limit: 10MB
+- In-memory processing only
+- Transparent PNG response
+- SEO-friendly landing pages
+- Privacy Policy and Terms pages
+- sitemap.xml and robots.txt support
+
+## Local development
 
 ```bash
 npm install
@@ -25,18 +28,45 @@ npm install
 
 Create `.env.local`:
 
-```
-REMOVE_BG_API_KEY=your_api_key_here
+```bash
+REMOVE_BG_API_KEY=your_remove_bg_api_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Get your API key at [remove.bg/api](https://www.remove.bg/api).
+Run the dev server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open <http://localhost:3000>.
 
-## Deploy
+## API
 
-Deploy to [Vercel](https://vercel.com) in one click. Add `REMOVE_BG_API_KEY` in the environment variables settings.
+### `POST /api/remove-bg`
+
+Accepts `multipart/form-data` with the field:
+
+- `image`
+
+Returns:
+
+- `image/png` on success
+- JSON error payload on failure
+
+## Deployment notes
+
+Deploy to Cloudflare Pages and set these environment variables:
+
+- `REMOVE_BG_API_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+
+Recommended production value for `NEXT_PUBLIC_SITE_URL`:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+## Privacy model
+
+This app is designed not to permanently store uploaded images or processed outputs. Images are forwarded to remove.bg only to fulfill the current request.

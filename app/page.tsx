@@ -1,157 +1,157 @@
-'use client'
+import type { Metadata } from 'next'
 
-import { useCallback, useState } from 'react'
-
-type State = 'idle' | 'loading' | 'done' | 'error'
+export const metadata: Metadata = {
+  title: 'Image Background Remover – Remove Background from Images Online',
+  description:
+    'Remove backgrounds from images online in seconds. Create transparent PNGs for product photos, portraits, and more. No software required.',
+}
 
 export default function Home() {
-  const [state, setState] = useState<State>('idle')
-  const [original, setOriginal] = useState<string | null>(null)
-  const [result, setResult] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [dragging, setDragging] = useState(false)
-
-  const process = useCallback(async (file: File) => {
-    setOriginal(URL.createObjectURL(file))
-    setResult(null)
-    setError(null)
-    setState('loading')
-
-    const fd = new FormData()
-    fd.append('image', file)
-
-    try {
-      const res = await fetch('/api/remove-bg', { method: 'POST', body: fd })
-      if (!res.ok) {
-        const json = await res.json()
-        throw new Error(json.error ?? 'Something went wrong')
-      }
-      const blob = await res.blob()
-      setResult(URL.createObjectURL(blob))
-      setState('done')
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Unknown error')
-      setState('error')
-    }
-  }, [])
-
-  const handleFile = (file: File) => {
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setError('Unsupported format. Use JPG, PNG or WEBP.')
-      setState('error')
-      return
-    }
-    process(file)
-  }
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file) handleFile(file)
-  }
-
-  const handleDownload = () => {
-    if (!result) return
-    const a = document.createElement('a')
-    a.href = result
-    a.download = 'removed-bg.png'
-    a.click()
-  }
-
-  const reset = () => {
-    setOriginal(null)
-    setResult(null)
-    setError(null)
-    setState('idle')
-  }
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Image Background Remover</h1>
-      <p className="text-gray-500 mb-10">Upload an image and get a transparent PNG instantly</p>
-
-      {/* Upload area */}
-      {state === 'idle' && (
-        <label
-          className={`w-full max-w-lg h-56 flex flex-col items-center justify-center border-2 border-dashed rounded-2xl cursor-pointer transition-colors ${
-            dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-400'
-          }`}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-        >
-          <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="text-gray-500">Drag & drop or <span className="text-blue-500 font-medium">browse</span></p>
-          <p className="text-gray-400 text-sm mt-1">JPG, PNG, WEBP · Max 10MB</p>
-          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleInput} />
-        </label>
-      )}
-
-      {/* Loading */}
-      {state === 'loading' && (
-        <div className="flex flex-col items-center gap-4">
-          {original && <img src={original} alt="original" className="w-64 h-64 object-contain rounded-xl shadow" />}
-          <div className="flex items-center gap-2 text-gray-500">
-            <svg className="animate-spin w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-            </svg>
-            Removing background…
+    <main className="min-h-screen">
+      <section className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+            Free online tool
+          </span>
+          <h1 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            Image Background Remover
+          </h1>
+          <p className="mt-4 text-lg text-gray-600">
+            Remove backgrounds from images online in seconds. Create transparent PNGs for product photos,
+            portraits, and more.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-gray-500">
+            <span>Fast processing</span>
+            <span>•</span>
+            <span>Transparent PNG output</span>
+            <span>•</span>
+            <span>Images are not stored</span>
           </div>
         </div>
-      )}
 
-      {/* Result */}
-      {state === 'done' && (
-        <div className="flex flex-col items-center gap-6 w-full max-w-2xl">
-          <div className="grid grid-cols-2 gap-4 w-full">
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-sm text-gray-400 font-medium">Original</p>
-              {original && <img src={original} alt="original" className="w-full rounded-xl shadow object-contain max-h-64" />}
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-sm text-gray-400 font-medium">Result</p>
-              <div className="w-full rounded-xl shadow overflow-hidden max-h-64 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZTVlN2ViIi8+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNlNWU3ZWIiLz48cmVjdCB4PSIxMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjlmYWZiIi8+PHJlY3QgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2Y5ZmFmYiIvPjwvc3ZnPg==')]">
-                {result && <img src={result} alt="result" className="w-full object-contain max-h-64" />}
-              </div>
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <UploaderCard />
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900">Why people use it</h2>
+            <div className="mt-6 space-y-4 text-sm text-gray-600">
+              <Feature
+                title="Product photos"
+                text="Clean up ecommerce product images for marketplaces, ads, and landing pages."
+              />
+              <Feature
+                title="Portraits"
+                text="Create profile photos, headshots, and simple cutouts without design tools."
+              />
+              <Feature
+                title="Transparent PNGs"
+                text="Generate PNG files with transparent backgrounds for reuse in websites and designs."
+              />
             </div>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleDownload}
-              className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors"
-            >
-              Download PNG
-            </button>
-            <button
-              onClick={reset}
-              className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
-            >
-              New Image
-            </button>
-          </div>
         </div>
-      )}
 
-      {/* Error */}
-      {state === 'error' && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-6 py-4 text-sm">
-            {error}
+        <section className="grid gap-6 md:grid-cols-3">
+          <InfoCard
+            title="How it works"
+            text="Upload a JPG, PNG, or WEBP image. The app sends it to remove.bg and returns a transparent PNG."
+          />
+          <InfoCard
+            title="Privacy"
+            text="Images are processed only for the request and are not stored by this app."
+          />
+          <InfoCard
+            title="Limits"
+            text="Single image upload, supported formats only, and a maximum file size of 10MB."
+          />
+        </section>
+
+        <section className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-semibold text-gray-900">Frequently asked questions</h2>
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <FaqItem
+              question="Is this image background remover free?"
+              answer="Yes, the tool can be offered as a free MVP. Usage limits can be added later if needed."
+            />
+            <FaqItem
+              question="Do you store uploaded images?"
+              answer="No. The app is designed to process images in request memory only and does not keep image history."
+            />
+            <FaqItem
+              question="What file types are supported?"
+              answer="JPG, PNG, and WEBP are supported in the MVP version."
+            />
+            <FaqItem
+              question="What do I download?"
+              answer="You download a transparent PNG after the background has been removed."
+            />
           </div>
-          <button onClick={reset} className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors">
-            Try Again
-          </button>
-        </div>
-      )}
+        </section>
+      </section>
     </main>
+  )
+}
+
+function UploaderCard() {
+  return (
+    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+      <h2 className="text-xl font-semibold text-gray-900">Upload your image</h2>
+      <p className="mt-2 text-sm text-gray-600">JPG, PNG, WEBP · Max 10MB · Transparent PNG output</p>
+
+      <form action="/api/remove-bg" method="post" encType="multipart/form-data" className="mt-6">
+        <label className="flex min-h-72 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center transition hover:border-blue-400 hover:bg-blue-50">
+          <div className="text-base font-medium text-gray-800">Drag and drop or browse</div>
+          <div className="mt-2 text-sm text-gray-500">Choose one image to remove its background</div>
+          <input
+            type="file"
+            name="image"
+            accept="image/jpeg,image/png,image/webp"
+            className="mt-6 block w-full max-w-xs text-sm text-gray-600 file:mr-4 file:rounded-xl file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-blue-700"
+          />
+        </label>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <button
+            type="submit"
+            className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
+          >
+            Remove Background
+          </button>
+          <a
+            href="/privacy"
+            className="rounded-xl border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+          >
+            Privacy Policy
+          </a>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function Feature({ title, text }: { title: string; text: string }) {
+  return (
+    <div>
+      <h3 className="font-medium text-gray-900">{title}</h3>
+      <p className="mt-1 leading-6">{text}</p>
+    </div>
+  )
+}
+
+function InfoCard({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-gray-600">{text}</p>
+    </div>
+  )
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+      <h3 className="font-medium text-gray-900">{question}</h3>
+      <p className="mt-2 text-sm leading-6 text-gray-600">{answer}</p>
+    </div>
   )
 }
